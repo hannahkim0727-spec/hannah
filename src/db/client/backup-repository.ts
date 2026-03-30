@@ -1,0 +1,213 @@
+"use client";
+
+import { appDb } from "@/db/client/app-db";
+import { backupPayloadSchema, type BackupPayload } from "@/shared/lib/backup";
+
+export async function exportBackupPayload(): Promise<BackupPayload> {
+  const [
+    budgetPlans,
+    expenseEntries,
+    assetAccounts,
+    portfolioHoldings,
+    savingsGoals,
+    people,
+    interactionLogs,
+    prayerItems,
+    sermonNotes,
+    worshipSongs,
+    bibleBooks,
+    bibleProgress,
+    churchVisits,
+    retreatRecords,
+    reflectionPosts,
+    visionGoals,
+    actionTasks,
+    calendarEvents,
+    thoughtNotes,
+    dormGuideItems,
+  ] = await Promise.all([
+    appDb.budgetPlans.toArray(),
+    appDb.expenseEntries.toArray(),
+    appDb.assetAccounts.toArray(),
+    appDb.portfolioHoldings.toArray(),
+    appDb.savingsGoals.toArray(),
+    appDb.relationshipPeople.toArray(),
+    appDb.relationshipInteractionLogs.toArray(),
+    appDb.prayerItems.toArray(),
+    appDb.sermonNotes.toArray(),
+    appDb.worshipSongs.toArray(),
+    appDb.bibleBooks.toArray(),
+    appDb.bibleProgress.toArray(),
+    appDb.churchVisits.toArray(),
+    appDb.retreatRecords.toArray(),
+    appDb.reflectionPosts.toArray(),
+    appDb.visionGoals.toArray(),
+    appDb.actionTasks.toArray(),
+    appDb.calendarEvents.toArray(),
+    appDb.thoughtNotes.toArray(),
+    appDb.dormGuideItems.toArray(),
+  ]);
+
+  return backupPayloadSchema.parse({
+    version: 1,
+    exportedAt: new Date().toISOString(),
+    domains: {
+      finance: {
+        budgetPlans,
+        expenseEntries,
+        assetAccounts,
+        portfolioHoldings,
+        savingsGoals,
+      },
+      relationships: { people, interactionLogs },
+      spiritual: {
+        bibleBooks,
+        bibleProgress,
+        prayerItems,
+        sermonNotes,
+        worshipSongs,
+        churchVisits,
+        retreatRecords,
+      },
+      life: {
+        reflectionPosts,
+        visionGoals,
+        actionTasks,
+        calendarEvents,
+        thoughtNotes,
+        dormGuideItems,
+      },
+    },
+  });
+}
+
+export async function importBackupPayload(raw: unknown) {
+  const payload = backupPayloadSchema.parse(raw);
+
+  await appDb.transaction(
+    "rw",
+    [
+      appDb.budgetPlans,
+      appDb.expenseEntries,
+      appDb.assetAccounts,
+      appDb.portfolioHoldings,
+      appDb.savingsGoals,
+      appDb.relationshipPeople,
+      appDb.relationshipInteractionLogs,
+      appDb.prayerItems,
+      appDb.sermonNotes,
+      appDb.worshipSongs,
+      appDb.bibleBooks,
+      appDb.bibleProgress,
+      appDb.churchVisits,
+      appDb.retreatRecords,
+      appDb.reflectionPosts,
+      appDb.visionGoals,
+      appDb.actionTasks,
+      appDb.calendarEvents,
+      appDb.thoughtNotes,
+      appDb.dormGuideItems,
+    ],
+    async () => {
+      await Promise.all([
+        appDb.budgetPlans.clear(),
+        appDb.expenseEntries.clear(),
+        appDb.assetAccounts.clear(),
+        appDb.portfolioHoldings.clear(),
+        appDb.savingsGoals.clear(),
+        appDb.relationshipPeople.clear(),
+        appDb.relationshipInteractionLogs.clear(),
+        appDb.prayerItems.clear(),
+        appDb.sermonNotes.clear(),
+        appDb.worshipSongs.clear(),
+        appDb.bibleBooks.clear(),
+        appDb.bibleProgress.clear(),
+        appDb.churchVisits.clear(),
+        appDb.retreatRecords.clear(),
+        appDb.reflectionPosts.clear(),
+        appDb.visionGoals.clear(),
+        appDb.actionTasks.clear(),
+        appDb.calendarEvents.clear(),
+        appDb.thoughtNotes.clear(),
+        appDb.dormGuideItems.clear(),
+      ]);
+
+      await Promise.all([
+        appDb.budgetPlans.bulkPut(payload.domains.finance.budgetPlans),
+        appDb.expenseEntries.bulkPut(payload.domains.finance.expenseEntries),
+        appDb.assetAccounts.bulkPut(payload.domains.finance.assetAccounts),
+        appDb.portfolioHoldings.bulkPut(payload.domains.finance.portfolioHoldings),
+        appDb.savingsGoals.bulkPut(payload.domains.finance.savingsGoals),
+        appDb.relationshipPeople.bulkPut(payload.domains.relationships.people),
+        appDb.relationshipInteractionLogs.bulkPut(
+          payload.domains.relationships.interactionLogs,
+        ),
+        appDb.bibleBooks.bulkPut(payload.domains.spiritual.bibleBooks),
+        appDb.prayerItems.bulkPut(payload.domains.spiritual.prayerItems),
+        appDb.sermonNotes.bulkPut(payload.domains.spiritual.sermonNotes),
+        appDb.worshipSongs.bulkPut(payload.domains.spiritual.worshipSongs),
+        appDb.bibleProgress.bulkPut(payload.domains.spiritual.bibleProgress),
+        appDb.churchVisits.bulkPut(payload.domains.spiritual.churchVisits),
+        appDb.retreatRecords.bulkPut(payload.domains.spiritual.retreatRecords),
+        appDb.reflectionPosts.bulkPut(payload.domains.life.reflectionPosts),
+        appDb.visionGoals.bulkPut(payload.domains.life.visionGoals),
+        appDb.actionTasks.bulkPut(payload.domains.life.actionTasks),
+        appDb.calendarEvents.bulkPut(payload.domains.life.calendarEvents),
+        appDb.thoughtNotes.bulkPut(payload.domains.life.thoughtNotes),
+        appDb.dormGuideItems.bulkPut(payload.domains.life.dormGuideItems),
+      ]);
+    },
+  );
+}
+
+export async function clearAllData() {
+  await appDb.transaction(
+    "rw",
+    [
+      appDb.budgetPlans,
+      appDb.expenseEntries,
+      appDb.assetAccounts,
+      appDb.portfolioHoldings,
+      appDb.savingsGoals,
+      appDb.relationshipPeople,
+      appDb.relationshipInteractionLogs,
+      appDb.prayerItems,
+      appDb.sermonNotes,
+      appDb.worshipSongs,
+      appDb.bibleBooks,
+      appDb.bibleProgress,
+      appDb.churchVisits,
+      appDb.retreatRecords,
+      appDb.reflectionPosts,
+      appDb.visionGoals,
+      appDb.actionTasks,
+      appDb.calendarEvents,
+      appDb.thoughtNotes,
+      appDb.dormGuideItems,
+    ],
+    async () => {
+      await Promise.all([
+        appDb.budgetPlans.clear(),
+        appDb.expenseEntries.clear(),
+        appDb.assetAccounts.clear(),
+        appDb.portfolioHoldings.clear(),
+        appDb.savingsGoals.clear(),
+        appDb.relationshipPeople.clear(),
+        appDb.relationshipInteractionLogs.clear(),
+        appDb.prayerItems.clear(),
+        appDb.sermonNotes.clear(),
+        appDb.worshipSongs.clear(),
+        appDb.bibleBooks.clear(),
+        appDb.bibleProgress.clear(),
+        appDb.churchVisits.clear(),
+        appDb.retreatRecords.clear(),
+        appDb.reflectionPosts.clear(),
+        appDb.visionGoals.clear(),
+        appDb.actionTasks.clear(),
+        appDb.calendarEvents.clear(),
+        appDb.thoughtNotes.clear(),
+        appDb.dormGuideItems.clear(),
+      ]);
+    },
+  );
+}

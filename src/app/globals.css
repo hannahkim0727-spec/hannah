@@ -1,0 +1,67 @@
+@import "pretendard/dist/web/static/pretendard.css";
+@import "tailwindcss";
+
+:root {
+  --background: #fafaf9; /* soft, warm white */
+  --foreground: #4e484b; /* dark taupe - softer than black */
+  --surface: #ffffff;
+  --surface-strong: #f6f4f2;
+  --sidebar: #ffffff;
+  --border: #f0ebe6;
+  --border-strong: #e6dfd8;
+  --muted-foreground: #999390;
+  --accent: #ffb6c1; /* pastel pink */
+  --accent-strong: #f596a5;
+  --accent-soft: #ffe8ec;
+  --accent-foreground: #ffffff;
+  --ring: rgba(255, 182, 193, 0.35);
+  --font-sans: "Pretendard", "Segoe UI", "Apple SD Gothic Neo", "Noto Sans KR",
+    sans-serif;
+  --font-display: "Georgia", "Times New Roman", serif;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-sans);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  min-height: 100%;
+}
+
+body {
+  min-height: 100vh;
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-sans);
+  /* default soft scrollbar for body */
+}
+
+.font-display {
+  font-family: var(--font-display);
+}
+
+::selection {
+  background: var(--ring);
+}
+
+/* Beautiful custom internal scrollbar */
+.custom-scrollbar::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: var(--border-strong);
+  border-radius: 10px;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: var(--accent-strong);
+}
