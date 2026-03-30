@@ -10,7 +10,9 @@
     "dev:electron": "wait-on tcp:3000 && cross-env ELECTRON_START_URL=http://localhost:3000 electron .",
     "build": "next build --webpack",
     "build:web": "next build --webpack",
-    "dist": "npm run build:web && cross-env CSC_IDENTITY_AUTO_DISCOVERY=false electron-builder --mac zip",
+    "dist": "npm run dist:mac",
+    "dist:mac": "npm run build:web && cross-env CSC_IDENTITY_AUTO_DISCOVERY=false electron-builder --mac zip",
+    "dist:win": "npm run build:web && electron-builder --win nsis",
     "lint": "eslint .",
     "typecheck": "tsc --noEmit"
   },
